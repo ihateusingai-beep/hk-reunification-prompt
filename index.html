@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>慶祝香港回歸祖國 — 詞彙與構思工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        :root {
+            --fs-multiplier: 1.125;
+            --red: #dc2626;
+            --gold: #f59e0b;
+            --purple: #7c3aed;
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #fef2f2 0%, #fffbeb 50%, #faf5ff 100%);
+            min-height: 100vh;
+            font-size: calc(1rem * var(--fs-multiplier));
+        }
+        .text-xs { font-size: calc(0.75rem * var(--fs-multiplier)) !important; }
+        .text-sm { font-size: calc(0.875rem * var(--fs-multiplier)) !important; }
+        .text-base { font-size: calc(1rem * var(--fs-multiplier)) !important; }
+        .text-lg { font-size: calc(1.125rem * var(--fs-multiplier)) !important; }
+        .text-xl { font-size: calc(1.25rem * var(--fs-multiplier)) !important; }
+        .text-2xl { font-size: calc(1.5rem * var(--fs-multiplier)) !important; }
+        .text-3xl { font-size: calc(1.875rem * var(--fs-multiplier)) !important; }
+
+        /* Tab */
+        .tab-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 4px solid transparent;
+        }
+        .tab-btn.active {
+            background: white;
+            color: var(--red);
+            border-bottom-color: var(--red);
+            box-shadow: 0 -4px 12px rgba(220, 38, 38, 0.08);
+        }
+        .tab-panel { display: none; animation: fadeIn 0.35s ease-out; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Vocab card */
+        .vocab-card {
+            background: white;
+            border: 2px solid #f3f4f6;
+            border-radius: 1rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            text-align: center;
+            user-select: none;
+        }
+        .vocab-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--red);
+            box-shadow: 0 8px 16px -4px rgba(220, 38, 38, 0.15);
+        }
+        .vocab-card.copied {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-color: #16a34a;
+        }
+        .vocab-card.copied::after {
+            content: '✓ 已複製';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #16a34a;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-weight: bold;
+        }
+        .category-section {
+            scroll-margin-top: 80px;
+        }
+        .cat-anchor {
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+        .cat-anchor.active {
+            background: var(--red);
+            color: white;
+            border-left-color: var(--gold);
+        }
+
+        /* Wizard */
+        .wizard-step { display: none; animation: fadeIn 0.35s ease-out; }
+        .wizard-step.active { display: block; }
+        .progress-pill {
+            height: 8px;
+            border-radius: 999px;
+            background: #fee2e2;
+            transition: background 0.3s;
+        }
+        .progress-pill.done { background: var(--red); }
+        .progress-pill.current {
+            background: linear-gradient(90deg, var(--gold), var(--red));
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+        }
+
+        .option-card {
+            background: white;
+            border: 2px solid #f3f4f6;
+            border-radius: 1rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            position: relative;
+        }
+        .option-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold);
+            box-shadow: 0 6px 12px -2px rgba(245, 158, 11, 0.2);
+        }
+        .option-card.selected {
+            border-color: var(--red) !important;
+            background: linear-gradient(135deg, #fff1f2 0%, #fffbeb 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -4px rgba(220, 38, 38, 0.25);
+        }
+        .option-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--red);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        /* Preset card */
+        .preset-card {
+            background: linear-gradient(135deg, #fef3c7 0%, #fee2e2 100%);
+            border: 3px solid var(--gold);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+        .preset-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .preset-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            border-color: var(--red);
+            box-shadow: 0 12px 24px -6px rgba(220, 38, 38, 0.3);
+        }
+        .preset-card:hover::before { opacity: 1; }
+
+        /* Section title */
+        .section-title {
+            position: relative;
+            padding-left: 1rem;
+            border-left: 5px solid var(--red);
+        }
+
+        /* Bauhinia pattern decoration */
+        .deco-bauhinia {
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(220, 38, 38, 0.05) 0%, transparent 8%),
+                radial-gradient(circle at 80% 70%, rgba(245, 158, 11, 0.05) 0%, transparent 8%);
+            background-size: 200px 200px;
+        }
+
+        /* Live preview bar */
+        #live-preview-bar {
+            position: sticky;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(8px);
+            border-top: 2px solid #fecaca;
+            z-index: 10;
+        }
+        .preview-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border: 1px solid #fecaca;
+            white-space: nowrap;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 999px;
+            font-weight: bold;
+            box-shadow: 0 8px 24px -4px rgba(0,0,0,0.2);
+            z-index: 100;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Print styles */
+        @media print {
+            body { background: white !important; }
+            .no-print, .tab-btn, #live-preview-bar, button { display: none !important; }
+            .vocab-card { break-inside: avoid; border: 1px solid #333 !important; box-shadow: none !important; }
+            .category-section { page-break-inside: avoid; }
+            .tab-panel { display: block !important; }
+            #tab-vocab { display: block !important; }
+            #tab-wizard { display: none !important; }
+        }
+
+        /* Settings panel */
+        .settings-panel {
+            position: fixed;
+            top: 0; right: 0; bottom: 0;
+            width: 320px;
+            background: white;
+            box-shadow: -8px 0 24px rgba(0,0,0,0.15);
+            z-index: 60;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+        }
+        .settings-panel.open { transform: translateX(0); }
+        .settings-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 55;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .settings-overlay.open { opacity: 1; pointer-events: auto; }
+
+        /* Responsive wizard progress */
+        @media (max-width: 640px) {
+            .tab-btn { padding: 0.75rem 0.5rem; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body class="deco-bauhinia">
+
+    <!-- Top banner -->
+    <header class="bg-gradient-to-r from-red-700 via-red-600 to-red-700 text-white shadow-lg sticky top-0 z-30 no-print">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">🇭🇰</span>
+                <div>
+                    <h1 class="text-lg sm:text-2xl font-black tracking-wide">慶祝香港回歸祖國</h1>
+                    <p class="text-xs sm:text-sm opacity-90">詞彙學習庫 · 繪圖構思工具</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button id="btn-print" class="bg-white/20 hover:bg-white/30 backdrop-blur px-3 py-2 rounded-lg text-sm font-bold transition-all" title="列印詞彙表">
+                    <i class="fa-solid fa-print"></i> <span class="hidden sm:inline">列印</span>
+                </button>
+                <button id="btn-settings" class="bg-white/20 hover:bg-white/30 backdrop-blur w-10 h-10 rounded-lg flex items-center justify-center transition-all" title="偏好設定">
+                    <i class="fa-solid fa-sliders"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Tab buttons -->
+        <div class="max-w-7xl mx-auto px-4 flex">
+            <button class="tab-btn active flex-1 py-3 px-4 font-bold text-white text-sm sm:text-base" data-tab="vocab">
+                <i class="fa-solid fa-book-open mr-2"></i>詞彙學習庫
+            </button>
+            <button class="tab-btn flex-1 py-3 px-4 font-bold text-white/70 text-sm sm:text-base hover:text-white" data-tab="wizard">
+                <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>繪圖構思器
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+
+        <!-- ============== TAB 1: VOCABULARY LIBRARY ============== -->
+        <div id="tab-vocab" class="tab-panel active">
+            <div class="flex flex-col lg:flex-row gap-6">
+
+                <!-- Sidebar: category anchors -->
+                <aside class="lg:w-56 shrink-0 no-print">
+                    <div class="bg-white rounded-2xl shadow-md p-4 lg:sticky lg:top-32">
+                        <h3 class="font-bold text-gray-700 mb-3 text-sm uppercase tracking-wide">
+                            <i class="fa-solid fa-list-ul text-red-600 mr-1"></i> 詞彙分類
+                        </h3>
+                        <nav id="cat-nav" class="flex flex-col gap-1">
+                            <!-- anchors injected by JS -->
+                        </nav>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <button id="btn-copy-all" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg text-sm transition-all">
+                                <i class="fa-solid fa-copy mr-1"></i> 複製全部詞彙
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Vocabulary cards -->
+                <div id="vocab-container" class="flex-1 space-y-8">
+                    <!-- categories injected by JS -->
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============== TAB 2: WIZARD ============== -->
+        <div id="tab-wizard" class="tab-panel">
+
+            <!-- Progress bar -->
+            <div class="bg-white rounded-2xl shadow-md p-4 mb-4 no-print">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xs font-bold text-gray-500">步驟</span>
+                    <span id="step-label" class="text-sm font-black text-red-600">0 / 5</span>
+                    <button id="btn-wizard-restart" class="ml-auto text-xs text-gray-500 hover:text-red-600 transition-colors">
+                        <i class="fa-solid fa-rotate-right"></i> 重新開始
+                    </button>
+                </div>
+                <div class="grid grid-cols-5 gap-2" id="progress-pills">
+                    <!-- pills injected by JS -->
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-4 border-red-100">
+
+                <!-- STEP 0: Preset scenes -->
+                <div class="wizard-step active" data-step="0">
+                    <div class="bg-gradient-to-r from-amber-100 to-red-100 p-6 text-center">
+                        <h2 class="text-2xl font-black text-red-700 mb-2">一鍵構思場景</h2>
+                        <p class="text-sm text-gray-600">揀一個預設場景，所有選項自動帶入，之後可微調</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="preset-grid">
+                        <!-- presets injected by JS -->
+                    </div>
+                    <div class="p-6 pt-0 text-center">
+                        <button id="btn-skip-preset" class="text-sm text-gray-500 hover:text-red-600 underline">
+                            唔揀 preset，由零開始 →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 1: Style -->
+                <div class="wizard-step" data-step="1">
+                    <div class="bg-red-600 text-white p-5">
+                        <span class="text-xs font-bold opacity-80">STEP 1 / 5</span>
+                        <h2 class="text-2xl font-black">選擇畫面風格</h2>
+                        <p class="text-sm opacity-90 mt-1">影響最終 AI 繪圖嘅視覺風格</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="group-style"></div>
+                </div>
+
+                <!-- STEP 2: Crowd + Emotion -->
+                <div class="wizard-step" data-step="2">
+                    <div class="bg-red-600 text-white p-5">
+                        <span class="text-xs font-bold opacity-80">STEP 2 / 5</span>
+                        <h2 class="text-2xl font-black">設計群像與情緒</h2>
+                        <p class="text-sm opacity-90 mt-1">先揀主角身份，再加情緒感受（可多選）</p>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <div>
+                            <h3 class="section-title font-bold text-gray-800 mb-3">主角身份（單選）</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="group-crowd"></div>
+                        </div>
+                        <div>
+                            <h3 class="section-title font-bold text-gray-800 mb-3">情緒與感覺（可多選）</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="group-emotion"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Location -->
+                <div class="wizard-step" data-step="3">
+                    <div class="bg-red-600 text-white p-5">
+                        <span class="text-xs font-bold opacity-80">STEP 3 / 5</span>
+                        <h2 class="text-2xl font-black">設定場景地點</h2>
+                        <p class="text-sm opacity-90 mt-1">回歸慶祝活動嘅香港地標（單選）</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-2 sm:grid-cols-3 gap-3" id="group-location"></div>
+                </div>
+
+                <!-- STEP 4: Activity -->
+                <div class="wizard-step" data-step="4">
+                    <div class="bg-red-600 text-white p-5">
+                        <span class="text-xs font-bold opacity-80">STEP 4 / 5</span>
+                        <h2 class="text-2xl font-black">揀選慶祝活動</h2>
+                        <p class="text-sm opacity-90 mt-1">畫面中大家做緊咩（單選）</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-2 sm:grid-cols-3 gap-3" id="group-activity"></div>
+                </div>
+
+                <!-- STEP 5: Symbols + Final -->
+                <div class="wizard-step" data-step="5">
+                    <div class="bg-red-600 text-white p-5">
+                        <span class="text-xs font-bold opacity-80">STEP 5 / 5</span>
+                        <h2 class="text-2xl font-black">加入符號與裝飾</h2>
+                        <p class="text-sm opacity-90 mt-1">國旗、區旗、紫荊花等（可多選）</p>
+                    </div>
+                    <div class="p-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="group-symbols"></div>
+                </div>
+
+                <!-- STEP 6: Final prompt -->
+                <div class="wizard-step" data-step="6">
+                    <div class="bg-gradient-to-r from-amber-100 to-red-100 p-6 text-center">
+                        <h2 class="text-3xl font-black text-red-700 mb-2">🎉 構思完成 🎉</h2>
+                        <p class="text-sm text-gray-600">複製下面嘅文字 prompt，貼去任何 AI 繪圖工具即可</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="bg-gradient-to-br from-red-50 to-amber-50 p-6 rounded-2xl border-4 border-red-200 mb-6">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                <i class="fa-solid fa-quote-left"></i> 中文構思描述
+                            </p>
+                            <p id="final-cn" class="text-base text-gray-800 leading-loose mb-4"></p>
+                            <hr class="border-red-200 my-4">
+                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                <i class="fa-solid fa-quote-left"></i> English Prompt (for AI image tools)
+                            </p>
+                            <p id="final-en" class="text-sm text-gray-700 leading-loose font-mono bg-white/60 p-3 rounded-lg"></p>
+                        </div>
+                        <div class="flex flex-col gap-3 max-w-md mx-auto">
+                            <button id="btn-copy-cn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-copy"></i> 複製中文描述
+                            </button>
+                            <button id="btn-copy-en" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-copy"></i> 複製 English Prompt
+                            </button>
+                            <button id="btn-copy-both" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-2xl shadow transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-clipboard"></i> 複製兩個版本
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wizard nav -->
+                <div class="bg-gray-50 px-6 py-4 border-t-2 border-gray-100 flex justify-between items-center">
+                    <button id="btn-wizard-prev" class="text-gray-500 font-bold py-2 px-5 rounded-xl hover:text-red-600 hover:bg-red-50 transition-all">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> 上一步
+                    </button>
+                    <button id="btn-wizard-next" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all">
+                        下一步 <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live preview -->
+            <div id="live-preview-bar" class="mt-3 py-3 px-4 rounded-2xl shadow flex items-center gap-3 overflow-x-auto whitespace-nowrap no-print">
+                <span class="text-xs font-bold text-red-600 uppercase tracking-tighter shrink-0">
+                    <i class="fa-solid fa-eye"></i> 即時預覽
+                </span>
+                <div id="live-preview-content" class="flex gap-2 items-center">
+                    <span class="text-gray-400 text-xs italic">尚未選擇任何內容...</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Settings overlay -->
+    <div id="settings-overlay" class="settings-overlay no-print"></div>
+    <aside id="settings-panel" class="settings-panel no-print">
+        <div class="bg-red-600 text-white p-4 flex justify-between items-center">
+            <h2 class="font-bold"><i class="fa-solid fa-gear mr-2"></i>偏好設定</h2>
+            <button id="btn-close-settings" class="text-2xl hover:text-amber-200">&times;</button>
+        </div>
+        <div class="p-6 space-y-6">
+            <div>
+                <label class="font-bold text-gray-700 block mb-3 border-b pb-2">
+                    字體大小 <span id="fs-display" class="text-red-600 text-sm ml-2">18px</span>
+                </label>
+                <input type="range" id="fs-slider" min="0" max="5" value="2" class="w-full accent-red-600">
+                <div class="flex justify-between text-xs text-gray-500 mt-2 px-1">
+                    <span>14px</span><span>16px</span><span>18px</span><span>22px</span><span>26px</span><span>32px</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Toast -->
+    <div id="toast" class="toast no-print">已複製到剪貼簿</div>
+
+    <script>
+        // ==================== DATA ====================
+
+        // Vocabulary categories (5 categories from user spec)
+        const vocabCategories = [
+            {
+                id: 'color',
+                name: '顏色與氛圍詞',
+                icon: '🎨',
+                color: '#dc2626',
+                items: [
+                    { word: '紅色', emoji: '🔴', en: 'China red', note: '中國紅，喜慶主色' },
+                    { word: '金色', emoji: '✨', en: 'gold', note: '富貴繁榮' },
+                    { word: '紫色', emoji: '💜', en: 'purple', note: '紫荊花顏色' },
+                    { word: '喜慶', emoji: '🎊', en: 'joyful celebration' },
+                    { word: '燦爛', emoji: '🌟', en: 'brilliant, dazzling' },
+                    { word: '團結', emoji: '🤝', en: 'unity' },
+                    { word: '繁榮', emoji: '📈', en: 'prosperity' },
+                    { word: '永遠', emoji: '♾️', en: 'forever' }
+                ]
+            },
+            {
+                id: 'symbol',
+                name: '符號與景物詞',
+                icon: '🏵️',
+                color: '#7c3aed',
+                items: [
+                    { word: '五星紅旗', emoji: '🇨🇳', en: 'Five-star Red Flag', note: '中國國旗' },
+                    { word: '紫荊區旗', emoji: '🇭🇰', en: 'Bauhinia regional flag', note: '香港區旗' },
+                    { word: '紫荊花', emoji: '🌺', en: 'Bauhinia flower', note: '香港區花' },
+                    { word: '維多利亞港', emoji: '🌊', en: 'Victoria Harbour', note: '維港' },
+                    { word: '天星碼頭', emoji: '⛴️', en: 'Star Ferry Pier' },
+                    { word: '煙火', emoji: '🎆', en: 'fireworks' },
+                    { word: '燈籠', emoji: '🏮', en: 'lantern' },
+                    { word: '中國龍', emoji: '🐉', en: 'Chinese dragon' },
+                    { word: '醒獅', emoji: '🦁', en: 'lion dance' }
+                ]
+            },
+            {
+                id: 'activity',
+                name: '活動詞',
+                icon: '🎪',
+                color: '#f59e0b',
+                items: [
+                    { word: '升旗禮', emoji: '🚩', en: 'flag-raising ceremony' },
+                    { word: '煙火匯演', emoji: '🎇', en: 'fireworks display' },
+                    { word: '舞龍舞獅', emoji: '🐲', en: 'dragon and lion dance' },
+                    { word: '嘉年華', emoji: '🎠', en: 'carnival' },
+                    { word: '巡遊', emoji: '🎉', en: 'parade' },
+                    { word: '音樂會', emoji: '🎵', en: 'concert' },
+                    { word: '展覽', emoji: '🖼️', en: 'exhibition' },
+                    { word: '攤位遊戲', emoji: '🎯', en: 'game booths' },
+                    { word: '燈光秀', emoji: '💡', en: 'light show' }
+                ]
+            },
+            {
+                id: 'people',
+                name: '人物與感覺詞',
+                icon: '👨‍👩‍👧‍👦',
+                color: '#db2777',
+                items: [
+                    { word: '香港人', emoji: '🧑‍🦱', en: 'Hong Kong people' },
+                    { word: '中國人', emoji: '🧑', en: 'Chinese people' },
+                    { word: '大家一起', emoji: '👫', en: 'everyone together' },
+                    { word: '笑容', emoji: '😊', en: 'smiles' },
+                    { word: '歡呼', emoji: '🙌', en: 'cheering' },
+                    { word: '驕傲', emoji: '🦚', en: 'proud' },
+                    { word: '回家', emoji: '🏡', en: 'return home' },
+                    { word: '幸福', emoji: '🥰', en: 'happiness' },
+                    { word: '一國兩制', emoji: '⚖️', en: 'One Country, Two Systems' }
+                ]
+            },
+            {
+                id: 'time',
+                name: '時間與意義詞',
+                icon: '📅',
+                color: '#0f766e',
+                items: [
+                    { word: '七月一日', emoji: '🗓️', en: 'July 1st' },
+                    { word: '1997年回歸', emoji: '📜', en: '1997 Handover' },
+                    { word: '紀念日', emoji: '🎗️', en: 'anniversary' },
+                    { word: '齊慶祝', emoji: '🥳', en: 'celebrate together' },
+                    { word: '繁榮穩定', emoji: '🏛️', en: 'prosperity and stability' },
+                    { word: '共同發展', emoji: '🚀', en: 'common development' }
+                ]
+            }
+        ];
+
+        // Wizard data
+        const wizardData = {
+            style: [
+                { name: '3D 黏土模型', emoji: '🧸', en: '3D claymation style, handcrafted texture' },
+                { name: '皮克斯動畫風', emoji: '🎬', en: 'Pixar-style 3D animation render' },
+                { name: '夢幻水彩插畫', emoji: '🖌️', en: 'soft watercolor illustration' },
+                { name: '寫實節日攝影', emoji: '📸', en: 'professional photography, cinematic lighting, 8k' },
+                { name: '精緻日漫風格', emoji: '✨', en: 'high-quality anime style, vibrant colors' },
+                { name: '溫馨手繪繪本', emoji: '📖', en: 'warm hand-drawn picture book style' },
+                { name: '復古像素藝術', emoji: '👾', en: 'retro pixel art style' },
+                { name: '精緻剪紙藝術', emoji: '✂️', en: 'traditional Chinese paper cutting art' }
+            ],
+            crowd: [
+                { name: '香港市民', emoji: '🧑‍🦱', en: 'Hong Kong citizens' },
+                { name: '中國同胞', emoji: '🧑', en: 'Chinese compatriots' },
+                { name: '一家大小', emoji: '👨‍👩‍👧‍👦', en: 'a whole family' },
+                { name: '中小學生', emoji: '🎒', en: 'primary and secondary school students' },
+                { name: '青年朋友', emoji: '🧑‍🎓', en: 'young people' },
+                { name: '長輩', emoji: '👴', en: 'elderly' },
+                { name: '警察與紀律部隊', emoji: '👮', en: 'police and disciplined services' },
+                { name: '運動員代表', emoji: '🏅', en: 'athletes' }
+            ],
+            emotion: [
+                { word: '笑容', emoji: '😊', en: 'smiling brightly' },
+                { word: '歡呼', emoji: '🙌', en: 'cheering' },
+                { word: '揮手', emoji: '👋', en: 'waving hands' },
+                { word: '鼓掌', emoji: '👏', en: 'clapping' },
+                { word: '驕傲', emoji: '🦚', en: 'proud' },
+                { word: '感動', emoji: '🥹', en: 'touched' },
+                { word: '幸福', emoji: '🥰', en: 'happy' },
+                { word: '興奮', emoji: '🤩', en: 'excited' },
+                { word: '團結', emoji: '🤝', en: 'united' },
+                { word: '眼泛淚光', emoji: '😢', en: 'tears of joy' },
+                { word: '齊聲吶喊', emoji: '📣', en: 'chanting together' },
+                { word: '擁抱', emoji: '🫂', en: 'embracing' }
+            ],
+            location: [
+                { name: '維多利亞港海旁', emoji: '🌊', en: 'Victoria Harbour waterfront' },
+                { name: '金紫荊廣場', emoji: '🌅', en: 'Golden Bauhinia Square' },
+                { name: '會展中心', emoji: '🏛️', en: 'Hong Kong Convention and Exhibition Centre' },
+                { name: '尖沙咀鐘樓', emoji: '🗼', en: 'Tsim Sha Tsui Clock Tower' },
+                { name: '天星碼頭', emoji: '⛴️', en: 'Star Ferry Pier' },
+                { name: '獅子山下', emoji: '🦁', en: 'Lion Rock' },
+                { name: '中環海濱', emoji: '🌃', en: 'Central Harbourfront' },
+                { name: '屋邨廣場', emoji: '🏢', en: 'public housing estate plaza' },
+                { name: '學校禮堂', emoji: '🏫', en: 'school hall' }
+            ],
+            activity: [
+                { name: '升旗禮', emoji: '🚩', en: 'flag-raising ceremony' },
+                { name: '煙火匯演', emoji: '🎆', en: 'fireworks display' },
+                { name: '舞龍舞獅', emoji: '🐲', en: 'dragon and lion dance' },
+                { name: '嘉年華巡遊', emoji: '🎉', en: 'carnival parade' },
+                { name: '戶外音樂會', emoji: '🎵', en: 'outdoor concert' },
+                { name: '展覽開幕', emoji: '🖼️', en: 'exhibition opening' },
+                { name: '攤位遊戲', emoji: '🎯', en: 'game booths' },
+                { name: '維港燈光秀', emoji: '💡', en: 'Victoria Harbour light show' },
+                { name: '千人齊唱國歌', emoji: '🎤', en: 'thousands singing national anthem' }
+            ],
+            symbols: [
+                { name: '五星紅旗', emoji: '🇨🇳', en: 'Five-star Red Flag', note: '高高懸掛' },
+                { name: '紫荊區旗', emoji: '🇭🇰', en: 'Bauhinia regional flag', note: '隨風飄揚' },
+                { name: '紫荊花', emoji: '🌺', en: 'Bauhinia blossoms', note: '特寫或散落' },
+                { name: '煙火綻放', emoji: '🎆', en: 'fireworks bursting in the sky' },
+                { name: '大紅燈籠', emoji: '🏮', en: 'large red lanterns' },
+                { name: '中國龍', emoji: '🐉', en: 'Chinese dragon' },
+                { name: '醒獅', emoji: '🦁', en: 'lion dance' },
+                { name: '彩色氣球', emoji: '🎈', en: 'colorful balloons' },
+                { name: '金色綵帶', emoji: '🎀', en: 'golden ribbons' },
+                { name: '祝賀橫幅', emoji: '🎏', en: 'congratulatory banner' },
+                { name: '煙花匯演', emoji: '🎇', en: 'fireworks display' },
+                { name: '風車轉動', emoji: '🎐', en: 'pinwheels turning' }
+            ]
+        };
+
+        // Preset scenes — one-click templates
+        const presets = [
+            {
+                name: '維港煙火匯演',
+                emoji: '🎆',
+                desc: '維港夜空綻放煙火',
+                style: wizardData.style[3], // 寫實攝影
+                crowd: wizardData.crowd[0], // 香港市民
+                emotions: [wizardData.emotion[1], wizardData.emotion[7]], // 歡呼 + 興奮
+                location: wizardData.location[0], // 維港海旁
+                activity: wizardData.activity[1], // 煙火匯演
+                symbols: ['五星紅旗', '紫荊區旗', '煙火綻放', '彩色氣球']
+            },
+            {
+                name: '金紫荊升旗禮',
+                emoji: '🚩',
+                desc: '晨光中莊嚴升旗',
+                style: wizardData.style[3], // 寫實攝影
+                crowd: wizardData.crowd[6], // 警察紀律部隊
+                emotions: [wizardData.emotion[4], wizardData.emotion[2]], // 驕傲 + 揮手
+                location: wizardData.location[1], // 金紫荊廣場
+                activity: wizardData.activity[0], // 升旗禮
+                symbols: ['五星紅旗', '紫荊區旗', '祝賀橫幅']
+            },
+            {
+                name: '屋邨嘉年華',
+                emoji: '🎪',
+                desc: '街坊歡聚一堂',
+                style: wizardData.style[5], // 溫馨手繪繪本
+                crowd: wizardData.crowd[2], // 一家大小
+                emotions: [wizardData.emotion[0], wizardData.emotion[6]], // 笑容 + 幸福
+                location: wizardData.location[7], // 屋邨廣場
+                activity: wizardData.activity[6], // 攤位遊戲
+                symbols: ['大紅燈籠', '彩色氣球', '金色綵帶', '風車轉動']
+            },
+            {
+                name: '舞龍舞獅巡遊',
+                emoji: '🐲',
+                desc: '鑼鼓喧天熱鬧巡遊',
+                style: wizardData.style[1], // 皮克斯
+                crowd: wizardData.crowd[3], // 中小學生
+                emotions: [wizardData.emotion[1], wizardData.emotion[3]], // 歡呼 + 鼓掌
+                location: wizardData.location[3], // 尖沙咀鐘樓
+                activity: wizardData.activity[2], // 舞龍舞獅
+                symbols: ['中國龍', '醒獅', '大紅燈籠', '祝賀橫幅']
+            },
+            {
+                name: '維港燈光秀',
+                emoji: '💡',
+                desc: '摩天大樓燈光表演',
+                style: wizardData.style[3], // 寫實攝影
+                crowd: wizardData.crowd[4], // 青年朋友
+                emotions: [wizardData.emotion[7], wizardData.emotion[8]], // 興奮 + 團結
+                location: wizardData.location[0], // 維港海旁
+                activity: wizardData.activity[7], // 維港燈光秀
+                symbols: ['紫荊區旗', '紫荊花', '彩色氣球']
+            },
+            {
+                name: '學校慶祝活動',
+                emoji: '🏫',
+                desc: '校園內學生齊慶祝',
+                style: wizardData.style[5], // 溫馨手繪繪本
+                crowd: wizardData.crowd[3], // 中小學生
+                emotions: [wizardData.emotion[0], wizardData.emotion[4]], // 笑容 + 驕傲
+                location: wizardData.location[8], // 學校禮堂
+                activity: wizardData.activity[8], // 千人齊唱國歌
+                symbols: ['五星紅旗', '紫荊區旗', '紫荊花', '大紅燈籠']
+            }
+        ];
+
+        // ==================== STATE ====================
+        let currentTab = 'vocab';
+        let activeCategory = vocabCategories[0].id;
+        const fsLevels = [14, 16, 18, 22, 26, 32];
+        let currentFontSize = 18;
+
+        // Wizard state
+        let wizStep = 0; // 0 = preset, 1..5 = setup, 6 = final
+        const wizTotal = 6;
+        let wizSel = {
+            style: null,
+            crowd: null,
+            emotions: [],
+            location: null,
+            activity: null,
+            symbols: []
+        };
+
+        // ==================== VOCABULARY TAB ====================
+        function renderVocab() {
+            // Sidebar anchors
+            const nav = document.getElementById('cat-nav');
+            nav.innerHTML = '';
+            vocabCategories.forEach(cat => {
+                const a = document.createElement('button');
+                a.className = `cat-anchor text-left px-3 py-2 rounded-lg text-sm font-bold ${cat.id === activeCategory ? 'active' : 'text-gray-700 hover:bg-red-50'}`;
+                a.innerHTML = `<span class="mr-2">${cat.icon}</span>${cat.name}`;
+                a.onclick = () => {
+                    activeCategory = cat.id;
+                    renderVocab();
+                    document.getElementById(`cat-${cat.id}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                };
+                nav.appendChild(a);
+            });
+
+            // Cards
+            const container = document.getElementById('vocab-container');
+            container.innerHTML = '';
+            vocabCategories.forEach(cat => {
+                const section = document.createElement('section');
+                section.id = `cat-${cat.id}`;
+                section.className = 'category-section';
+                section.innerHTML = `
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl">${cat.icon}</span>
+                        <h2 class="text-2xl font-black" style="color:${cat.color}">${cat.name}</h2>
+                        <span class="ml-auto text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">${cat.items.length} 個詞彙</span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                        ${cat.items.map(item => `
+                            <div class="vocab-card" data-word="${item.word}" data-en="${item.en}">
+                                <div class="text-4xl mb-2">${item.emoji}</div>
+                                <div class="font-black text-gray-800 text-base">${item.word}</div>
+                                <div class="text-xs text-gray-500 mt-1">${item.en}</div>
+                                ${item.note ? `<div class="text-xs text-gray-400 mt-1 italic">${item.note}</div>` : ''}
+                                <div class="text-xs text-red-500 mt-2"><i class="fa-solid fa-copy"></i> 點擊複製</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(section);
+            });
+
+            // Bind click-to-copy
+            container.querySelectorAll('.vocab-card').forEach(card => {
+                card.onclick = () => {
+                    const word = card.dataset.word;
+                    const en = card.dataset.en;
+                    const text = `${word} (${en})`;
+                    copyToClipboard(text);
+                    card.classList.add('copied');
+                    showToast(`已複製：${word}`);
+                    setTimeout(() => card.classList.remove('copied'), 1200);
+                };
+            });
+        }
+
+        document.getElementById('btn-copy-all').onclick = () => {
+            let text = '慶祝香港回歸祖國 — 詞彙表\n';
+            text += '=' .repeat(40) + '\n\n';
+            vocabCategories.forEach(cat => {
+                text += `【${cat.name}】\n`;
+                cat.items.forEach(it => {
+                    text += `  ${it.word} (${it.en})`;
+                    if (it.note) text += ` — ${it.note}`;
+                    text += '\n';
+                });
+                text += '\n';
+            });
+            copyToClipboard(text);
+            showToast('已複製全部詞彙到剪貼簿');
+        };
+
+        document.getElementById('btn-print').onclick = () => {
+            // Switch to vocab tab if not already
+            if (currentTab !== 'vocab') switchTab('vocab');
+            setTimeout(() => window.print(), 100);
+        };
+
+        // ==================== WIZARD TAB ====================
+        function renderWizard() {
+            // Progress pills (6 steps: preset + 5 setup + 1 final)
+            const pills = document.getElementById('progress-pills');
+            pills.innerHTML = '';
+            for (let i = 0; i < wizTotal; i++) {
+                const pill = document.createElement('div');
+                pill.className = 'progress-pill';
+                pill.dataset.idx = i;
+                pills.appendChild(pill);
+            }
+            updateWizardUI();
+
+            // Preset grid
+            const presetGrid = document.getElementById('preset-grid');
+            presetGrid.innerHTML = '';
+            presets.forEach((preset, idx) => {
+                const card = document.createElement('div');
+                card.className = 'preset-card';
+                card.innerHTML = `
+                    <div class="text-5xl mb-2">${preset.emoji}</div>
+                    <h3 class="text-lg font-black text-red-700 mb-1">${preset.name}</h3>
+                    <p class="text-sm text-gray-600">${preset.desc}</p>
+                    <div class="text-xs text-red-500 mt-3 font-bold">
+                        <i class="fa-solid fa-bolt"></i> 一鍵帶入
+                    </div>
+                `;
+                card.onclick = () => applyPreset(preset);
+                presetGrid.appendChild(card);
+            });
+
+            // Render option cards
+            renderOptGroup('style', wizardData.style, (item) => {
+                wizSel.style = item;
+                updateWizardUI();
+                setTimeout(() => goWizStep(wizStep + 1), 400);
+            });
+            renderOptGroup('crowd', wizardData.crowd, (item) => {
+                wizSel.crowd = item;
+                updateWizardUI();
+            });
+            renderOptGroup('emotion', wizardData.emotion, (item) => {
+                const idx = wizSel.emotions.findIndex(e => e.word === item.word);
+                if (idx > -1) wizSel.emotions.splice(idx, 1);
+                else wizSel.emotions.push(item);
+                updateWizardUI();
+            });
+            renderOptGroup('location', wizardData.location, (item) => {
+                wizSel.location = item;
+                updateWizardUI();
+                setTimeout(() => goWizStep(wizStep + 1), 400);
+            });
+            renderOptGroup('activity', wizardData.activity, (item) => {
+                wizSel.activity = item;
+                updateWizardUI();
+                setTimeout(() => goWizStep(wizStep + 1), 400);
+            });
+            renderOptGroup('symbols', wizardData.symbols, (item) => {
+                const idx = wizSel.symbols.findIndex(e => e.name === item.name);
+                if (idx > -1) wizSel.symbols.splice(idx, 1);
+                else wizSel.symbols.push(item);
+                updateWizardUI();
+            });
+
+            // Final step
+            document.getElementById('btn-copy-cn').onclick = () => {
+                copyToClipboard(generateFinalCN());
+                showToast('已複製中文描述');
+            };
+            document.getElementById('btn-copy-en').onclick = () => {
+                copyToClipboard(generateFinalEN());
+                showToast('已複製 English Prompt');
+            };
+            document.getElementById('btn-copy-both').onclick = () => {
+                const text = generateFinalCN() + '\n\n---\n\n' + generateFinalEN();
+                copyToClipboard(text);
+                showToast('已複製兩個版本');
+            };
+
+            // Nav
+            document.getElementById('btn-wizard-prev').onclick = () => goWizStep(wizStep - 1);
+            document.getElementById('btn-wizard-next').onclick = () => goWizStep(wizStep + 1);
+            document.getElementById('btn-wizard-restart').onclick = () => {
+                wizStep = 0;
+                wizSel = { style: null, crowd: null, emotions: [], location: null, activity: null, symbols: [] };
+                updateWizardUI();
+            };
+            document.getElementById('btn-skip-preset').onclick = () => goWizStep(1);
+        }
+
+        function renderOptGroup(groupId, items, onClick) {
+            const container = document.getElementById(`group-${groupId}`);
+            if (!container) return;
+            container.innerHTML = '';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'option-card';
+                card.dataset.group = groupId;
+                card.dataset.name = item.name || item.word;
+                const label = item.name || item.word;
+                const sub = item.en || '';
+                const note = item.note ? `<div class="text-xs text-gray-400 italic mt-1">${item.note}</div>` : '';
+                card.innerHTML = `
+                    <div class="text-3xl mb-2">${item.emoji}</div>
+                    <div class="font-bold text-gray-800 text-sm">${label}</div>
+                    <div class="text-xs text-gray-500 mt-1">${sub}</div>
+                    ${note}
+                `;
+                card.onclick = () => {
+                    onClick(item);
+                    updateSelectedVisuals(groupId, item, items);
+                };
+                container.appendChild(card);
+            });
+        }
+
+        function updateSelectedVisuals(groupId, justClicked, items) {
+            const container = document.getElementById(`group-${groupId}`);
+            if (!container) return;
+            const isMulti = groupId === 'emotion' || groupId === 'symbols';
+            if (!isMulti) {
+                container.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+            }
+            const target = Array.from(container.children).find(c => c.dataset.name === (justClicked.name || justClicked.word));
+            if (target) target.classList.toggle('selected');
+        }
+
+        function syncAllSelectedVisuals() {
+            // Re-apply selected class based on wizSel state
+            const map = {
+                style: wizSel.style,
+                crowd: wizSel.crowd,
+                location: wizSel.location,
+                activity: wizSel.activity
+            };
+            Object.keys(map).forEach(groupId => {
+                const sel = map[groupId];
+                const container = document.getElementById(`group-${groupId}`);
+                if (!container) return;
+                container.querySelectorAll('.option-card').forEach(c => {
+                    c.classList.toggle('selected', sel && c.dataset.name === (sel.name || sel.word));
+                });
+            });
+            ['emotion', 'symbols'].forEach(groupId => {
+                const sel = wizSel[groupId];
+                const container = document.getElementById(`group-${groupId}`);
+                if (!container) return;
+                container.querySelectorAll('.option-card').forEach(c => {
+                    const isSel = sel.some(s => (s.name || s.word) === c.dataset.name);
+                    c.classList.toggle('selected', isSel);
+                });
+            });
+        }
+
+        function applyPreset(preset) {
+            wizSel.style = preset.style;
+            wizSel.crowd = preset.crowd;
+            wizSel.emotions = preset.emotions.map(e => wizardData.emotion.find(x => x.word === e.word)).filter(Boolean);
+            wizSel.location = preset.location;
+            wizSel.activity = preset.activity;
+            wizSel.symbols = preset.symbols.map(name => wizardData.symbols.find(x => x.name === name)).filter(Boolean);
+            wizStep = 6; // jump to final
+            updateWizardUI();
+            showToast(`已帶入：${preset.name}`);
+        }
+
+        function goWizStep(step) {
+            if (step < 0 || step > wizTotal) return;
+            // Validate
+            if (step > wizStep) {
+                if (wizStep === 0 && step > 1 && !wizSel.style) {
+                    showToast('請先選擇風格');
+                    return;
+                }
+                if (wizStep === 1 && step > 2 && !wizSel.crowd) {
+                    showToast('請先選擇主角身份');
+                    return;
+                }
+                if (wizStep === 2 && step > 3 && !wizSel.location) {
+                    showToast('請先選擇地點');
+                    return;
+                }
+                if (wizStep === 3 && step > 4 && !wizSel.activity) {
+                    showToast('請先選擇活動');
+                    return;
+                }
+            }
+            wizStep = step;
+            updateWizardUI();
+            syncAllSelectedVisuals();
+        }
+
+        function updateWizardUI() {
+            // Show step
+            document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
+            const target = document.querySelector(`.wizard-step[data-step="${wizStep}"]`);
+            if (target) target.classList.add('active');
+
+            // Progress pills (skip final in step count display)
+            const displayStep = wizStep === wizTotal ? 5 : wizStep;
+            document.getElementById('step-label').textContent = `${displayStep} / 5`;
+            document.querySelectorAll('.progress-pill').forEach((pill, i) => {
+                pill.classList.remove('done', 'current');
+                if (wizStep === wizTotal) {
+                    pill.classList.add('done');
+                } else if (i < wizStep) {
+                    pill.classList.add('done');
+                } else if (i === wizStep) {
+                    pill.classList.add('current');
+                }
+            });
+
+            // Nav buttons
+            document.getElementById('btn-wizard-prev').style.visibility = (wizStep === 0) ? 'hidden' : 'visible';
+            const isFinal = wizStep === wizTotal;
+            document.getElementById('btn-wizard-next').style.visibility = isFinal ? 'hidden' : 'visible';
+            const nextBtn = document.getElementById('btn-wizard-next');
+            nextBtn.innerHTML = (wizStep === 0) ? '開始自訂構思 <i class="fa-solid fa-chevron-right ml-1"></i>' : '下一步 <i class="fa-solid fa-chevron-right ml-1"></i>';
+
+            // Final prompt
+            if (isFinal) {
+                document.getElementById('final-cn').innerHTML = generateFinalCN();
+                document.getElementById('final-en').textContent = generateFinalEN();
+            }
+
+            // Live preview
+            updateLivePreview();
+        }
+
+        function updateLivePreview() {
+            const container = document.getElementById('live-preview-content');
+            container.innerHTML = '';
+            const parts = [];
+            if (wizSel.style) parts.push({ label: '風格', val: wizSel.style.name });
+            if (wizSel.crowd) parts.push({ label: '主角', val: wizSel.crowd.name });
+            if (wizSel.emotions.length) parts.push({ label: '情緒', val: wizSel.emotions.map(e => e.word).join('、') });
+            if (wizSel.location) parts.push({ label: '地點', val: wizSel.location.name });
+            if (wizSel.activity) parts.push({ label: '活動', val: wizSel.activity.name });
+            if (wizSel.symbols.length) parts.push({ label: '符號', val: wizSel.symbols.map(s => s.name).join('、') });
+
+            if (parts.length === 0) {
+                container.innerHTML = `<span class="text-gray-400 text-xs italic">尚未選擇任何內容...</span>`;
+                return;
+            }
+            parts.forEach(p => {
+                const span = document.createElement('span');
+                span.className = 'preview-tag';
+                span.innerHTML = `<span class="opacity-50 text-[10px] mr-1">${p.label}:</span> ${p.val}`;
+                container.appendChild(span);
+            });
+        }
+
+        function generateFinalCN() {
+            const s = wizSel;
+            if (!s.style && !s.crowd && !s.location) return '請先在構思器選擇場景元素';
+            const styleName = s.style?.name || '某種風格';
+            const crowdName = s.crowd?.name || '香港人';
+            const emoText = s.emotions.length ? s.emotions.map(e => e.word).join('、') : '歡欣';
+            const locName = s.location?.name || '香港';
+            const actName = s.activity?.name || '慶祝';
+            const symText = s.symbols.length ? s.symbols.map(x => x.name).join('、') : '國旗、區旗';
+            return `我想用 <span class="text-red-600 font-bold">${styleName}</span> 畫一張圖。畫面中有 <span class="text-red-600 font-bold">${crowdName}</span>，他們<span class="text-red-600 font-bold">${emoText}</span>。場景喺 <span class="text-red-600 font-bold">${locName}</span>，大家一齊 <span class="text-red-600 font-bold">${actName}</span>。周圍有 <span class="text-red-600 font-bold">${symText}</span> 等慶祝元素，充滿喜慶、團結、繁榮嘅氣氛。`;
+        }
+
+        function generateFinalEN() {
+            const s = wizSel;
+            const parts = [];
+            if (s.style) parts.push(s.style.en);
+            parts.push('celebrating Hong Kong\'s return to China, July 1st reunification anniversary');
+            if (s.crowd) parts.push(`featuring ${s.crowd.en}`);
+            if (s.emotions.length) parts.push(`showing emotions: ${s.emotions.map(e => e.en).join(', ')}`);
+            if (s.location) parts.push(`located at ${s.location.en}`);
+            if (s.activity) parts.push(`${s.activity.en}`);
+            if (s.symbols.length) parts.push(`with ${s.symbols.map(x => x.en).join(', ')}`);
+            parts.push('red and gold festive color palette, joyful patriotic atmosphere, Chinese national flag and Hong Kong Bauhinia flag prominently displayed, vibrant celebratory mood, 8k, high detail');
+            return parts.join(', ');
+        }
+
+        // ==================== UTILITIES ====================
+        function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+        function fallbackCopy(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(showToast._t);
+            showToast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+        }
+
+        // ==================== TABS & SETTINGS ====================
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.tab === tab);
+            });
+            document.querySelectorAll('.tab-panel').forEach(p => {
+                p.classList.toggle('active', p.id === `tab-${tab}`);
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.onclick = () => switchTab(btn.dataset.tab);
+        });
+
+        function initSettings() {
+            const panel = document.getElementById('settings-panel');
+            const overlay = document.getElementById('settings-overlay');
+            const open = () => { panel.classList.add('open'); overlay.classList.add('open'); };
+            const close = () => { panel.classList.remove('open'); overlay.classList.remove('open'); };
+            document.getElementById('btn-settings').onclick = open;
+            document.getElementById('btn-close-settings').onclick = close;
+            overlay.onclick = close;
+
+            const fsSlider = document.getElementById('fs-slider');
+            fsSlider.oninput = (e) => {
+                currentFontSize = fsLevels[e.target.value];
+                document.getElementById('fs-display').innerText = `${currentFontSize}px`;
+                document.documentElement.style.setProperty('--fs-multiplier', currentFontSize / 16);
+            };
+            document.documentElement.style.setProperty('--fs-multiplier', currentFontSize / 16);
+        }
+
+        // ==================== INIT ====================
+        window.onload = () => {
+            renderVocab();
+            renderWizard();
+            initSettings();
+        };
+    </script>
+</body>
+</html>
